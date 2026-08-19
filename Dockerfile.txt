@@ -1,0 +1,17 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# system deps for torch-geometric may be required; this is a minimal image
+RUN apt-get update && apt-get install -y build-essential git curl && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --upgrade pip
+# Install requirements (torch-geometric installation may need custom steps on GPU)
+RUN pip install -r requirements.txt
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["uvicorn", "lightgcn_recommender:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
